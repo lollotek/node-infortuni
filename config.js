@@ -24,7 +24,8 @@ const STATE_PAUSED_AT_MIN = 4;  //
 
 // --- Struttura Configurazione LED (Class in JS) ---
 class LedConfig {
-  constructor(pin) {
+  constructor(id, pin) {
+    this.id = id + 1;
     this.pin = pin; // GPIO BCM number
     this.minIntensity = 0; //
     this.maxIntensity = 100; // Default, RPi PWM usually 0-255 or 0-1000

@@ -3,18 +3,20 @@ const {LedConfig, LED_PINS, NUM_LEDS, CONFIG_FETCH_INTERVAL_MS, STATUS_LED_OFF} 
 const { initStatusLed, setNetworkStatus, cleanupStatusLed } = require('./status_led_control');
 const { fetchLedConfiguration } = require('./http_config');
 const { updateLedAnimation } = require('./led_control');
+const { initOSC, closeOSC } = require('./osc');
 
 let currentRow = 1; //
 let maxRowsContainer = { value: 0 }; // Use an object to pass by reference
 let lastConfigFetchTime = 0; //
 let initialFetchDone = false; //
 
-const ledConfigs = LED_PINS.map(pin => new LedConfig(pin)); //
+const ledConfigs = LED_PINS.map((pin, index) => new LedConfig(index, pin)); //
 
 async function setup() {
   console.log("\n\nAvvio RPi GlowConfig Controller..."); //
 
   initStatusLed();
+  initOSC();
   setNetworkStatus(false);
 
   console.log("Configurazione Pin LED Animazione..."); //
@@ -106,6 +108,7 @@ function mainLoop() {
   process.on('SIGINT', () => {
     console.log("Ricevuto SIGINT. Pulizia GPIO...");
     cleanupStatusLed();
+    closeOSC();
     ledConfigs.forEach(config => {
       if (config.gpio) {
         config.gpio.pwmWrite(STATUS_LED_OFF); // Turn off LED

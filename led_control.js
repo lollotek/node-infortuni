@@ -1,3 +1,5 @@
+const { sendOSCMessage } = require('./osc');
+
 const {
     STATE_FADING_UP, STATE_FADING_DOWN, STATE_PAUSED_AT_MAX, STATE_PAUSED_AT_MIN,
     CYCLE_ASCEND_RESET, CYCLE_DESCEND_RESET, CYCLE_INVERT
@@ -57,8 +59,9 @@ function updateLedAnimation(config) { //
                     }
                 }
                 if (config.gpio) {
-                    // Ensure currentIntensity is an integer for pwmWrite
-                    config.gpio.pwmWrite(Math.round(config.currentIntensity));
+                    const valueToWrite = Math.round(config.currentIntensity); 
+                    config.gpio.pwmWrite(valueToWrite);
+                    sendOSCMessage(config.id, valueToWrite);
                 }
             }
             break;
