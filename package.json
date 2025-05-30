@@ -11,6 +11,6 @@
   "description": "",
   "dependencies": {
     "axios": "^1.9.0",
-    "onoff": "^6.0.3"
+    "pigpio": "^3.3.1"
   }
 }

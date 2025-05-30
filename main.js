@@ -1,5 +1,5 @@
-const { Gpio } = require('onoff');
-const {LedConfig, LED_PINS, NUM_LEDS, CONFIG_FETCH_INTERVAL_MS} = require('./config');
+const Gpio = require('pigpio').Gpio;
+const {LedConfig, LED_PINS, NUM_LEDS, CONFIG_FETCH_INTERVAL_MS, STATUS_LED_OFF} = require('./config');
 const { initStatusLed, setNetworkStatus, cleanupStatusLed } = require('./status_led_control');
 const { fetchLedConfiguration } = require('./http_config');
 const { updateLedAnimation } = require('./led_control');
@@ -18,23 +18,16 @@ async function setup() {
   setNetworkStatus(false);
 
   console.log("Configurazione Pin LED Animazione..."); //
-  if (Gpio.accessible) {
-    ledConfigs.forEach(config => {
-      try {
-        config.gpio = new Gpio(config.pin, 'out'); // Use 'out' for pwmWrite with onoff
-        // Initial state for PWM is 0 (off)
-        config.gpio.pwmWrite(0); // Start with LEDs off
-      } catch (err) {
-        console.error(`Failed to initialize GPIO ${config.pin}: ${err.message}`);
-        config.gpio = { pwmWrite: (val) => console.log(`Mock GPIO ${config.pin} PWM: ${val}`) }; // Mock if error
-      }
-    });
-  } else {
-    console.warn('GPIO not accessible. LED animation will be mocked.');
-    ledConfigs.forEach(config => {
-        config.gpio = { pwmWrite: (val) => console.log(`Mock GPIO ${config.pin} PWM: ${val}`) };
-    });
-  }
+
+  ledConfigs.forEach(config => {
+    try {
+      config.gpio = new Gpio(config.pin, {mode: Gpio.OUTPUT});
+      config.gpio.pwmWrite(STATUS_LED_OFF); // Start with LEDs off
+    } catch (err) {
+      console.error(`Failed to initialize GPIO ${config.pin}: ${err.message}`);
+      // config.gpio = { pwmWrite: (val) => console.log(`Mock GPIO ${config.pin} PWM: ${val}`) }; // Mock if error
+    }
+  });
 
   console.log("Tentativo Fetch Configurazione Iniziale..."); //
   initialFetchDone = await fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer); //
@@ -114,9 +107,8 @@ function mainLoop() {
     console.log("Ricevuto SIGINT. Pulizia GPIO...");
     cleanupStatusLed();
     ledConfigs.forEach(config => {
-      if (config.gpio && Gpio.accessible) {
-        config.gpio.pwmWrite(0); // Turn off LED
-        config.gpio.unexport();
+      if (config.gpio) {
+        config.gpio.pwmWrite(STATUS_LED_OFF); // Turn off LED
       }
     });
     console.log("GPIO puliti. Uscita.");

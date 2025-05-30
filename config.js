@@ -1,15 +1,15 @@
 // --- Pin Definitions ---
 // https://stackoverflow.com/questions/78173749/use-raspberry-pi-4-gpio-with-node-js
 // WARNING: These pin numbers can be check using $cat /sys/kernel/debug/gpio
-const STATUS_LED_PIN = 516;  // BCM GPIO4
-const LED1_PIN = 529;       // BCM GPIO17
-const LED2_PIN = 539;       // BCM GPIO27
-const LED3_PIN = 534;       // BCM GPIO22
+const STATUS_LED_PIN = 4;  // BCM GPIO4
+const LED1_PIN = 17;       // BCM GPIO17
+const LED2_PIN = 27;       // BCM GPIO27
+const LED3_PIN = 22;       // BCM GPIO22
 const LED_PINS = [LED1_PIN, LED2_PIN, LED3_PIN];
 const NUM_LEDS = LED_PINS.length;
 
 // --- LED di Stato ---
-const STATUS_LED_ON = 1; // For 'onoff', 1 is typically ON
+const STATUS_LED_ON = 255; 
 const STATUS_LED_OFF = 0;
 const CONFIG_BLINK_INTERVAL_MS = 800; // Lampeggio durante config/errore
 
@@ -40,7 +40,6 @@ class LedConfig {
     this.lastUpdateTime = 0; //
     this.pauseStartTime = 0; //
 
-    // 'onoff' specific GPIO object
     this.gpio = null; // To be initialized in main
   }
 }

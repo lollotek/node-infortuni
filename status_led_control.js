@@ -1,29 +1,21 @@
-const { Gpio } = require('onoff');
+const Gpio = require('pigpio').Gpio;
 const { STATUS_LED_PIN, STATUS_LED_ON, STATUS_LED_OFF, CONFIG_BLINK_INTERVAL_MS } = require('./config'); //
 
 let statusLed;
-let statusLedState = false; //
-let lastStatusBlinkTime = 0; //
+let statusLedState = false;
 let blinkIntervalId = null;
-let isNetworkConnected = false; // This needs to be updated by your app's network check
+let isNetworkConnected = false;
 
 function initStatusLed() {
-  if (Gpio.accessible) {
-    statusLed = new Gpio(STATUS_LED_PIN, 'out'); //
-    updateStatusLedAppearance();
-  } else {
-    console.warn('GPIO not accessible. Status LED will not function.');
-    statusLed = { // Mock object if GPIO not available
-        writeSync: (value) => console.log(`Mock Status LED: ${value}`)
-    };
-  }
+  statusLed = new Gpio(STATUS_LED_PIN, {mode: Gpio.OUTPUT});
+  updateStatusLedAppearance();
 }
 
 function setNetworkStatus(isConnected) {
-    if (isNetworkConnected !== isConnected) {
-        isNetworkConnected = isConnected;
-        updateStatusLedAppearance();
-    }
+  if (isNetworkConnected !== isConnected) {
+    isNetworkConnected = isConnected;
+    updateStatusLedAppearance();
+  }
 }
 
 function updateStatusLedAppearance() {
@@ -33,13 +25,12 @@ function updateStatusLedAppearance() {
   }
 
   if (isNetworkConnected) {
-    statusLed.writeSync(STATUS_LED_ON); //
-    statusLedState = true; //
+    statusLed.pwmWrite(STATUS_LED_ON);
   } else {
     // Non Connesso: LED Lampeggiante
     blinkIntervalId = setInterval(() => {
       statusLedState = !statusLedState; //
-      statusLed.writeSync(statusLedState ? STATUS_LED_ON : STATUS_LED_OFF); //
+      statusLed.pwmWrite(statusLedState ? STATUS_LED_ON : STATUS_LED_OFF);
     }, CONFIG_BLINK_INTERVAL_MS); //
   }
 }
@@ -47,8 +38,7 @@ function updateStatusLedAppearance() {
 function cleanupStatusLed() {
     if (blinkIntervalId) clearInterval(blinkIntervalId);
     if (statusLed && Gpio.accessible) {
-        statusLed.writeSync(STATUS_LED_OFF);
-        statusLed.unexport();
+        statusLed.pwmWrite(STATUS_LED_OFF);
     }
 }
 
