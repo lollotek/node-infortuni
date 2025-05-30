@@ -107,7 +107,7 @@ function resetLedState(config) { //
         // Ensure currentIntensity is an integer
         config.gpio.pwmWrite(Math.round(config.currentIntensity));
     }
-    console.log(`LED Pin <span class="math-inline">\{config\.pin\}\: Stato resettato\. Intensity\=</span>{config.currentIntensity}, State=${config.animationState}`); //
+    console.log(`LED Pin ${config.pin}: Stato resettato. Intensity=${config.currentIntensity}, State=${config.animationState}`); //
 }
 
 module.exports = { updateLedAnimation, resetLedState };

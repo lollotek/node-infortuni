@@ -1,8 +1,10 @@
 // --- Pin Definitions ---
-const STATUS_LED_PIN = 4;  // BCM GPIO4
-const LED1_PIN = 17;       // BCM GPIO17
-const LED2_PIN = 27;       // BCM GPIO27
-const LED3_PIN = 22;       // BCM GPIO22
+// https://stackoverflow.com/questions/78173749/use-raspberry-pi-4-gpio-with-node-js
+// WARNING: These pin numbers can be check using $cat /sys/kernel/debug/gpio
+const STATUS_LED_PIN = 516;  // BCM GPIO4
+const LED1_PIN = 529;       // BCM GPIO17
+const LED2_PIN = 539;       // BCM GPIO27
+const LED3_PIN = 534;       // BCM GPIO22
 const LED_PINS = [LED1_PIN, LED2_PIN, LED3_PIN];
 const NUM_LEDS = LED_PINS.length;
 

@@ -10,8 +10,8 @@ async function fetchLedConfiguration(rowNum, configs, maxRowsRef) { //
     //    return false;
     // } // More robust check would be a ping or DNS resolve
 
-    const url = `<span class="math-inline">\{CONFIG\_ENDPOINT\_BASE\}?row\=</span>{rowNum}`; //
-    console.log(`Workspaceing config da: ${url}`); //
+    const url = `${CONFIG_ENDPOINT_BASE}?row=${rowNum}`; //
+    console.log(`config da: ${url}`); //
 
     const response = await axios.get(url, {
       headers: {
@@ -28,7 +28,7 @@ async function fetchLedConfiguration(rowNum, configs, maxRowsRef) { //
       maxRowsRef.value = payload.maxRows !== undefined ? payload.maxRows : -1; //
       const receivedRow = payload.currentRow !== undefined ? payload.currentRow : -1; //
 
-      console.log(`JSON Parsed: currentRow=<span class="math-inline">\{receivedRow\}, maxRows\=</span>{maxRowsRef.value}`); //
+      console.log(`JSON Parsed: currentRow=${receivedRow}, maxRows=${maxRowsRef.value}`); //
 
       if (receivedRow !== rowNum && receivedRow !== -1) { //
         console.warn(`Attenzione: Richiesta riga ${rowNum} ma ricevuta riga ${receivedRow}`); //
