@@ -5,21 +5,21 @@ const { fetchLedConfiguration } = require('./http_config');
 const { updateLedAnimation } = require('./led_control');
 const { initOSC, closeOSC } = require('./osc');
 
-let currentRow = 1; //
+let currentRow = 1;
 let maxRowsContainer = { value: 0 }; // Use an object to pass by reference
-let lastConfigFetchTime = 0; //
-let initialFetchDone = false; //
+let lastConfigFetchTime = 0;
+let initialFetchDone = false;
 
-const ledConfigs = LED_PINS.map((pin, index) => new LedConfig(index, pin)); //
+const ledConfigs = LED_PINS.map((pin, index) => new LedConfig(index, pin));
 
 async function setup() {
-  console.log("\n\nAvvio RPi GlowConfig Controller..."); //
+  console.log("\n\nAvvio RPi GlowConfig Controller...");
 
   initStatusLed();
   initOSC();
   setNetworkStatus(false);
 
-  console.log("Configurazione Pin LED Animazione..."); //
+  console.log("Configurazione Pin LED Animazione...");
 
   ledConfigs.forEach(config => {
     try {
@@ -31,18 +31,18 @@ async function setup() {
     }
   });
 
-  console.log("Tentativo Fetch Configurazione Iniziale..."); //
-  initialFetchDone = await fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer); //
+  console.log("Tentativo Fetch Configurazione Iniziale...");
+  initialFetchDone = await fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer);
 
   if (initialFetchDone) {
-    console.log(`Configurazione iniziale (Riga ${currentRow}) caricata. Max Righe: ${maxRowsContainer.value}`); //
-    lastConfigFetchTime = Date.now(); //
+    console.log(`Configurazione iniziale (Riga ${currentRow}) caricata. Max Righe: ${maxRowsContainer.value}`);
+    lastConfigFetchTime = Date.now();
     setNetworkStatus(true); // Update status LED on successful fetch
   } else {
-    console.log("!!! Fetch Configurazione Iniziale Fallito. Uso valori di default."); //
+    console.log("!!! Fetch Configurazione Iniziale Fallito. Uso valori di default.");
     setNetworkStatus(false);
   }
-  console.log("Setup completato. Avvio loop principale."); //
+  console.log("Setup completato. Avvio loop principale.");
 }
 
 function mainLoop() {
@@ -71,15 +71,15 @@ function mainLoop() {
       }
     });
   } else if (!initialFetchDone ) { 
-    console.log("Riprovo fetch configurazione iniziale..."); //
+    console.log("Riprovo fetch configurazione iniziale...");
     fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer).then(success => { 
       initialFetchDone = success;
       if (initialFetchDone) {
-        console.log(`Configurazione iniziale (Riga ${currentRow}) caricata. Max Righe: ${maxRowsContainer.value}`); //
-        lastConfigFetchTime = Date.now(); //
+        console.log(`Configurazione iniziale (Riga ${currentRow}) caricata. Max Righe: ${maxRowsContainer.value}`);
+        lastConfigFetchTime = Date.now();
         setNetworkStatus(true);
       } else {
-        console.log("!!! Fetch Iniziale fallito di nuovo."); //
+        console.log("!!! Fetch Iniziale fallito di nuovo.");
          setNetworkStatus(false);
       }
     });

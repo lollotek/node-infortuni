@@ -1,5 +1,5 @@
 const Gpio = require('pigpio').Gpio;
-const { STATUS_LED_PIN, STATUS_LED_ON, STATUS_LED_OFF, CONFIG_BLINK_INTERVAL_MS } = require('./config'); //
+const { STATUS_LED_PIN, STATUS_LED_ON, STATUS_LED_OFF, CONFIG_BLINK_INTERVAL_MS } = require('./config');
 
 let statusLed;
 let statusLedState = false;
@@ -29,9 +29,9 @@ function updateStatusLedAppearance() {
   } else {
     // Non Connesso: LED Lampeggiante
     blinkIntervalId = setInterval(() => {
-      statusLedState = !statusLedState; //
+      statusLedState = !statusLedState;
       statusLed.pwmWrite(statusLedState ? STATUS_LED_ON : STATUS_LED_OFF);
-    }, CONFIG_BLINK_INTERVAL_MS); //
+    }, CONFIG_BLINK_INTERVAL_MS);
   }
 }
 
