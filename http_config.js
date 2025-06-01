@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { LedConfig, CONFIG_ENDPOINT_BASE, NUM_LEDS, CYCLE_INVERT } = require('./config');
+const { CONFIG_ENDPOINT_BASE, NUM_LEDS, CYCLE_INVERT } = require('./config');
 const { resetLedState } = require('./led_control'); // Assuming led_control.js is created
 
 async function fetchLedConfiguration(rowNum, configs, maxRowsRef, id = -1) {
@@ -48,16 +48,18 @@ async function fetchLedConfiguration(rowNum, configs, maxRowsRef, id = -1) {
         for (const ledJson of ledConfigsJson) {
           if (ledIndex >= NUM_LEDS) break;
 
-          configs[ledIndex].minIntensity = ledJson.minI !== undefined ? ledJson.minI : 0; 
-          configs[ledIndex].maxIntensity = ledJson.maxI !== undefined ? ledJson.maxI : 255;
-          configs[ledIndex].cycleType = ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT;
-          configs[ledIndex].stepValue = ledJson.stV !== undefined ? ledJson.stV : 5;
-          configs[ledIndex].stepIntervalMs = ledJson.stMs !== undefined ? ledJson.stMs : 50;
-          configs[ledIndex].randomness = ledJson.rand !== undefined ? ledJson.rand : 0;
-          configs[ledIndex].maxMsDuration = ledJson.maxMs !== undefined ? ledJson.maxMs : 0;
-          configs[ledIndex].minMsDuration = ledJson.minMs !== undefined ? ledJson.minMs : 0;
+          configs[ledIndex].minIntensity = parseFloat(ledJson.minI !== undefined ? ledJson.minI : 0); 
+          configs[ledIndex].maxIntensity = parseFloat(ledJson.maxI !== undefined ? ledJson.maxI : 255);
+          configs[ledIndex].cycleType = parseFloat(ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT);
+          configs[ledIndex].stepValue = parseFloat(ledJson.stV !== undefined ? ledJson.stV : 5);
+          configs[ledIndex].stepIntervalMs = parseFloat(ledJson.stMs !== undefined ? ledJson.stMs : 50);
+          configs[ledIndex].randomness = parseFloat(ledJson.rand !== undefined ? ledJson.rand : 0);
+          configs[ledIndex].maxMsDuration = parseFloat(ledJson.maxMs !== undefined ? ledJson.maxMs : 0);
+          configs[ledIndex].minMsDuration = parseFloat(ledJson.minMs !== undefined ? ledJson.minMs : 0);
 
           resetLedState(configs[ledIndex]);
+          console.log(`LED ${ledIndex + 1} configurato:`, JSON.stringify(configs[ledIndex], null, 2));
+
           ledIndex++;
         }
 
@@ -66,17 +68,17 @@ async function fetchLedConfiguration(rowNum, configs, maxRowsRef, id = -1) {
         }        
       }else{
         const ledJson = ledConfigsJson[id-1];
-        configs[id].minIntensity = ledJson.minI !== undefined ? ledJson.minI : 0; 
-        configs[id].maxIntensity = ledJson.maxI !== undefined ? ledJson.maxI : 255;
-        configs[id].cycleType = ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT;
-        configs[id].stepValue = ledJson.stV !== undefined ? ledJson.stV : 5;
-        configs[id].stepIntervalMs = ledJson.stMs !== undefined ? ledJson.stMs : 50;
-        configs[id].randomness = ledJson.rand !== undefined ? ledJson.rand : 0;
-        configs[id].maxMsDuration = ledJson.maxMs !== undefined ? ledJson.maxMs : 0;
-        configs[id].minMsDuration = ledJson.minMs !== undefined ? ledJson.minMs : 0;
+        configs[id].minIntensity = parseFloat(ledJson.minI !== undefined ? ledJson.minI : 0);
+        configs[id].maxIntensity = parseFloat(ledJson.maxI !== undefined ? ledJson.maxI : 255);
+        configs[id].cycleType = parseFloat(ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT);
+        configs[id].stepValue = parseFloat(ledJson.stV !== undefined ? ledJson.stV : 5);
+        configs[id].stepIntervalMs = parseFloat(ledJson.stMs !== undefined ? ledJson.stMs : 50);
+        configs[id].randomness = parseFloat(ledJson.rand !== undefined ? ledJson.rand : 0);
+        configs[id].maxMsDuration = parseFloat(ledJson.maxMs !== undefined ? ledJson.maxMs : 0);
+        configs[id].minMsDuration = parseFloat(ledJson.minMs !== undefined ? ledJson.minMs : 0);
 
         resetLedState(configs[id]);
-
+        console.log(`LED ${id} configurato:`, JSON.stringify(configs[id], null, 2));
       }
 
       return true;

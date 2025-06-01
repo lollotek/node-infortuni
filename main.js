@@ -27,7 +27,7 @@ async function setup() {
       config.gpio.pwmWrite(STATUS_LED_OFF); // Start with LEDs off
     } catch (err) {
       console.error(`Failed to initialize GPIO ${config.pin}: ${err.message}`);
-      // config.gpio = { pwmWrite: (val) => console.log(`Mock GPIO ${config.pin} PWM: ${val}`) }; // Mock if error
+      config.gpio = { pwmWrite: (val) => console.log(`Mock GPIO ${config.pin} PWM: ${val}`) }; // Mock if error
     }
   });
 
@@ -49,7 +49,7 @@ function mainLoop() {
   if (initialFetchDone) {
     ledConfigs.forEach(config => {
       if (config.cycleCompleted) {
-        console.log("Ciclo compleato per LED", config.id);
+        console.log("Ciclo completato per LED", config.id);
         currentRow++;
         if (maxRowsContainer.value > 0 && currentRow > maxRowsContainer.value) {
           console.log(`Raggiunta riga massima (${maxRowsContainer.value}), torno a riga 1.`);
@@ -59,7 +59,7 @@ function mainLoop() {
           currentRow = 1; 
         }
 
-        console.log(`Workspaceing nuova configurazione per riga ${currentRow}...`);
+        console.log(`Richiesta nuova configurazione per riga ${currentRow}...`);
         fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer, config.id).then(success => {
           if (success) {
             console.log(`Configurazione riga ${currentRow} caricata. Max Righe: ${maxRowsContainer.value}`);

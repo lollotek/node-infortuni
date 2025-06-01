@@ -2,7 +2,8 @@ const { sendOSCMessage } = require('./osc');
 
 const {
     STATE_FADING_UP, STATE_FADING_DOWN, STATE_PAUSED_AT_MAX, STATE_PAUSED_AT_MIN,
-    CYCLE_ASCEND_RESET, CYCLE_DESCEND_RESET, CYCLE_INVERT
+    CYCLE_ASCEND_RESET, CYCLE_DESCEND_RESET, CYCLE_INVERT,
+    CONFIG_FETCH_INTERVAL_MS
 } = require('./config');
 
 function constrain(value, min, max) {
@@ -31,8 +32,8 @@ function updateLedAnimation(config) {
                 }
                 config.currentIntensity = constrain(config.currentIntensity, config.minIntensity, config.maxIntensity);
 
-                if ((config.animationState === STATE_FADING_UP && config.currentIntensity === config.maxIntensity) ||
-                    (config.animationState === STATE_FADING_DOWN && config.currentIntensity === config.minIntensity)) {
+                if ((config.animationState === STATE_FADING_UP && config.currentIntensity >= config.maxIntensity) ||
+                    (config.animationState === STATE_FADING_DOWN && config.currentIntensity <= config.minIntensity)) {
 
                     if ((config.maxMsDuration > 0) && (config.animationState === STATE_FADING_UP)) {
                         config.animationState = STATE_PAUSED_AT_MAX;

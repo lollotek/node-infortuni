@@ -7,7 +7,12 @@ let blinkIntervalId = null;
 let isNetworkConnected = false;
 
 function initStatusLed() {
-  statusLed = new Gpio(STATUS_LED_PIN, {mode: Gpio.OUTPUT});
+  try {
+    statusLed = new Gpio(STATUS_LED_PIN, {mode: Gpio.OUTPUT});
+  } catch (err) {
+    console.error(`Failed to initialize CONFIG GPIO: ${err.message}`);
+    statusLed = { pwmWrite: (val) => console.log(`Mock CONFIG GPIO PWM: ${val}`) }; // Mock if error
+  }
   updateStatusLedAppearance();
 }
 
