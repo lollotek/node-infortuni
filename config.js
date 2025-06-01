@@ -41,6 +41,9 @@ class LedConfig {
     this.lastUpdateTime = 0;
     this.pauseStartTime = 0;
 
+    this.prevIntensity = null;
+    this.cycleStartTime = null;
+
     this.gpio = null; // To be initialized in main
   }
 }

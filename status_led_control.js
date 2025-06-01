@@ -37,7 +37,7 @@ function updateStatusLedAppearance() {
 
 function cleanupStatusLed() {
     if (blinkIntervalId) clearInterval(blinkIntervalId);
-    if (statusLed && Gpio.accessible) {
+    if (statusLed) {
         statusLed.pwmWrite(STATUS_LED_OFF);
     }
 }

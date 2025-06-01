@@ -46,30 +46,32 @@ async function setup() {
 }
 
 function mainLoop() {
-  const currentTime = Date.now();
+  if (initialFetchDone) {
+    ledConfigs.forEach(config => {
+      if (config.cycleCompleted) {
+        console.log("Ciclo compleato per LED", config.id);
+        currentRow++;
+        if (maxRowsContainer.value > 0 && currentRow > maxRowsContainer.value) {
+          console.log(`Raggiunta riga massima (${maxRowsContainer.value}), torno a riga 1.`);
+          currentRow = 1;
+        } else if (maxRowsContainer.value <= 0) {
+          console.log("maxRows non valido, richiedo riga 1.");
+          currentRow = 1; 
+        }
 
-  if (initialFetchDone && (currentTime - lastConfigFetchTime >= CONFIG_FETCH_INTERVAL_MS)) {
-    console.log("Intervallo fetch raggiunto.");
-    currentRow++;
-    if (maxRowsContainer.value > 0 && currentRow > maxRowsContainer.value) {
-      console.log(`Raggiunta riga massima (${maxRowsContainer.value}), torno a riga 1.`);
-      currentRow = 1;
-    } else if (maxRowsContainer.value <= 0) {
-      console.log("maxRows non valido, richiedo riga 1.");
-      currentRow = 1; 
-    }
-
-    console.log(`Workspaceing nuova configurazione per riga ${currentRow}...`);
-    fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer).then(success => {
-      if (success) {
-        console.log(`Configurazione riga ${currentRow} caricata. Max Righe: ${maxRowsContainer.value}`);
-        lastConfigFetchTime = Date.now();
-        setNetworkStatus(true);
-      } else {
-        console.log("!!! Fetch Fallito. Mantengo configurazione precedente.");
-        setNetworkStatus(false); // Indicate potential network issue
+        console.log(`Workspaceing nuova configurazione per riga ${currentRow}...`);
+        fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer, config.id).then(success => {
+          if (success) {
+            console.log(`Configurazione riga ${currentRow} caricata. Max Righe: ${maxRowsContainer.value}`);
+            lastConfigFetchTime = Date.now();
+            setNetworkStatus(true);
+          } else {
+            console.log("!!! Fetch Fallito. Mantengo configurazione precedente.");
+            setNetworkStatus(false); // Indicate potential network issue
+          }
+        });
       }
-    });
+    });    
   } else if (!initialFetchDone ) { 
     console.log("Riprovo fetch configurazione iniziale...");
     fetchLedConfiguration(currentRow, ledConfigs, maxRowsContainer).then(success => { 
@@ -85,7 +87,7 @@ function mainLoop() {
     });
   }
 
-  if (initialFetchDone || !Gpio.accessible) {
+  if (initialFetchDone) {
      ledConfigs.forEach(config => {
         updateLedAnimation(config);
      });
@@ -97,7 +99,7 @@ function mainLoop() {
   await setup();
   setInterval(mainLoop, CONFIG_FETCH_INTERVAL_MS / 10); // Fetch logic check runs more often
   setInterval(() => { // Dedicated animation loop
-    if (initialFetchDone || !Gpio.accessible) {
+    if (initialFetchDone) {
         ledConfigs.forEach(config => {
             updateLedAnimation(config);
         });

@@ -2,7 +2,7 @@ const axios = require('axios');
 const { LedConfig, CONFIG_ENDPOINT_BASE, NUM_LEDS, CYCLE_INVERT } = require('./config');
 const { resetLedState } = require('./led_control'); // Assuming led_control.js is created
 
-async function fetchLedConfiguration(rowNum, configs, maxRowsRef) {
+async function fetchLedConfiguration(rowNum, configs, maxRowsRef, id = -1) {
   try {
     // const networkInterfaces = require('os').networkInterfaces(); // Basic check
     // if (!networkInterfaces || !Object.keys(networkInterfaces).some(iface => networkInterfaces[iface].some(details => !details.internal && details.family === 'IPv4'))) {
@@ -43,26 +43,42 @@ async function fetchLedConfiguration(rowNum, configs, maxRowsRef) {
         return false;
       }
 
-      let ledIndex = 0;
-      for (const ledJson of ledConfigsJson) {
-        if (ledIndex >= NUM_LEDS) break;
+      if (id == -1){
+        let ledIndex = 0;
+        for (const ledJson of ledConfigsJson) {
+          if (ledIndex >= NUM_LEDS) break;
 
-        configs[ledIndex].minIntensity = ledJson.minI !== undefined ? ledJson.minI : 0; 
-        configs[ledIndex].maxIntensity = ledJson.maxI !== undefined ? ledJson.maxI : 255; // ESP was 1023
-        configs[ledIndex].cycleType = ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT;
-        configs[ledIndex].stepValue = ledJson.stV !== undefined ? ledJson.stV : 5;
-        configs[ledIndex].stepIntervalMs = ledJson.stMs !== undefined ? ledJson.stMs : 50;
-        configs[ledIndex].randomness = ledJson.rand !== undefined ? ledJson.rand : 0;
-        configs[ledIndex].maxMsDuration = ledJson.maxMs !== undefined ? ledJson.maxMs : 0;
-        configs[ledIndex].minMsDuration = ledJson.minMs !== undefined ? ledJson.minMs : 0;
+          configs[ledIndex].minIntensity = ledJson.minI !== undefined ? ledJson.minI : 0; 
+          configs[ledIndex].maxIntensity = ledJson.maxI !== undefined ? ledJson.maxI : 255;
+          configs[ledIndex].cycleType = ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT;
+          configs[ledIndex].stepValue = ledJson.stV !== undefined ? ledJson.stV : 5;
+          configs[ledIndex].stepIntervalMs = ledJson.stMs !== undefined ? ledJson.stMs : 50;
+          configs[ledIndex].randomness = ledJson.rand !== undefined ? ledJson.rand : 0;
+          configs[ledIndex].maxMsDuration = ledJson.maxMs !== undefined ? ledJson.maxMs : 0;
+          configs[ledIndex].minMsDuration = ledJson.minMs !== undefined ? ledJson.minMs : 0;
 
-        resetLedState(configs[ledIndex]);
-        ledIndex++;
+          resetLedState(configs[ledIndex]);
+          ledIndex++;
+        }
+
+        if (ledIndex !== NUM_LEDS) {
+          console.warn(`Attenzione: Ricevuti dati per ${ledIndex} LED, ma attesi ${NUM_LEDS}`);
+        }        
+      }else{
+        const ledJson = ledConfigsJson[id-1];
+        configs[id].minIntensity = ledJson.minI !== undefined ? ledJson.minI : 0; 
+        configs[id].maxIntensity = ledJson.maxI !== undefined ? ledJson.maxI : 255;
+        configs[id].cycleType = ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT;
+        configs[id].stepValue = ledJson.stV !== undefined ? ledJson.stV : 5;
+        configs[id].stepIntervalMs = ledJson.stMs !== undefined ? ledJson.stMs : 50;
+        configs[id].randomness = ledJson.rand !== undefined ? ledJson.rand : 0;
+        configs[id].maxMsDuration = ledJson.maxMs !== undefined ? ledJson.maxMs : 0;
+        configs[id].minMsDuration = ledJson.minMs !== undefined ? ledJson.minMs : 0;
+
+        resetLedState(configs[id]);
+
       }
 
-      if (ledIndex !== NUM_LEDS) {
-        console.warn(`Attenzione: Ricevuti dati per ${ledIndex} LED, ma attesi ${NUM_LEDS}`);
-      }
       return true;
     } else {
       console.error(`[HTTP] GET... fallito, codice non OK: ${response.status}`);

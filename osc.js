@@ -12,7 +12,7 @@ function initOSC() {
 
 function sendOSCMessage(index, value) {
   client.send(`${oscAddress}${index}`, [value], () => {
-    console.log(`OSC message sent to ${oscAddress}${index} with value: ${value}`);
+    // console.log(`OSC message sent to ${oscAddress}${index} with value: ${value}`);
   });
 }
 

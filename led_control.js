@@ -29,8 +29,6 @@ function updateLedAnimation(config) {
                 } else {
                     config.currentIntensity -= totalStep;
                 }
-                // Ensure intensity is scaled for 0-255 if original was 0-1023
-                // For now, assuming min/maxIntensity are already in the 0-255 range from config
                 config.currentIntensity = constrain(config.currentIntensity, config.minIntensity, config.maxIntensity);
 
                 if ((config.animationState === STATE_FADING_UP && config.currentIntensity === config.maxIntensity) ||
@@ -56,6 +54,7 @@ function updateLedAnimation(config) {
                                 config.animationState = (config.animationState === STATE_FADING_UP) ? STATE_FADING_DOWN : STATE_FADING_UP;
                                 break;
                         }
+                        config.cycleCompleted = ((currentTime - config.cycleStartTime) >= CONFIG_FETCH_INTERVAL_MS);
                     }
                 }
                 if (config.gpio) {
@@ -76,6 +75,7 @@ function updateLedAnimation(config) {
                     if (config.gpio) config.gpio.pwmWrite(Math.round(config.currentIntensity));
                 }
                 config.lastUpdateTime = currentTime;
+                config.cycleCompleted = ((currentTime - config.cycleStartTime) >= CONFIG_FETCH_INTERVAL_MS);
             }
             break;
         }
@@ -89,11 +89,14 @@ function updateLedAnimation(config) {
                     if (config.gpio) config.gpio.pwmWrite(Math.round(config.currentIntensity));
                 }
                 config.lastUpdateTime = currentTime;
+                config.cycleCompleted = ((currentTime - config.cycleStartTime) >= CONFIG_FETCH_INTERVAL_MS);
             }
             break;
         }
     }
 }
+
+
 
 function resetLedState(config) {
     if (config.minIntensity >= config.maxIntensity) {
@@ -105,6 +108,10 @@ function resetLedState(config) {
     }
     config.lastUpdateTime = Date.now();
     config.pauseStartTime = 0;
+
+    config.prevIntensity = null;
+    config.cycleStartTime = Date.now();
+    config.cycleCompleted = false;
 
     if (config.gpio) {
         // Ensure currentIntensity is an integer
