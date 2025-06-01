@@ -58,7 +58,7 @@ function updateLedAnimation(config) {
                     }
                 }
                 if (config.gpio) {
-                    const valueToWrite = Math.round(config.currentIntensity); 
+                    const valueToWrite = Math.round(constrain(config.currentIntensity, 0, 255)); // Ensure value is within PWM range
                     config.gpio.pwmWrite(valueToWrite);
                     sendOSCMessage(config.id, [valueToWrite]);
                 }
