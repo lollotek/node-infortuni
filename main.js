@@ -12,6 +12,35 @@ let initialFetchDone = false;
 
 const ledConfigs = LED_PINS.map((pin, index) => new LedConfig(index, pin));
 
+const startupDelay = 10000; // Ritardo in millisecondi (es. 5 secondi)
+console.log(`In attesa per ${startupDelay / 1000} secondi prima di avviare...`);
+setTimeout(async () => {
+  console.log('Avvio dell\'applicazione...');
+  await setup();
+  setInterval(mainLoop, CONFIG_FETCH_INTERVAL_MS / 10); // Fetch logic check runs more often
+  setInterval(() => { // Dedicated animation loop
+    if (initialFetchDone) {
+        ledConfigs.forEach(config => {
+            updateLedAnimation(config);
+        });
+    }
+  }, 16); // roughly 60fps for animations
+
+  // Graceful shutdown
+  process.on('SIGINT', () => {
+    console.log("Ricevuto SIGINT. Pulizia GPIO...");
+    cleanupStatusLed();
+    closeOSC();
+    ledConfigs.forEach(config => {
+      if (config.gpio) {
+        config.gpio.pwmWrite(STATUS_LED_OFF); // Turn off LED
+      }
+    });
+    console.log("GPIO puliti. Uscita.");
+    process.exit(0);
+  });
+}, startupDelay);
+
 async function setup() {
   console.log("\n\nAvvio RPi GlowConfig Controller...");
 
@@ -95,28 +124,28 @@ function mainLoop() {
 }
 
 // --- Start the application ---
-(async () => {
-  await setup();
-  setInterval(mainLoop, CONFIG_FETCH_INTERVAL_MS / 10); // Fetch logic check runs more often
-  setInterval(() => { // Dedicated animation loop
-    if (initialFetchDone) {
-        ledConfigs.forEach(config => {
-            updateLedAnimation(config);
-        });
-    }
-  }, 16); // roughly 60fps for animations
+// (async () => {
+//   await setup();
+//   setInterval(mainLoop, CONFIG_FETCH_INTERVAL_MS / 10); // Fetch logic check runs more often
+//   setInterval(() => { // Dedicated animation loop
+//     if (initialFetchDone) {
+//         ledConfigs.forEach(config => {
+//             updateLedAnimation(config);
+//         });
+//     }
+//   }, 16); // roughly 60fps for animations
 
-  // Graceful shutdown
-  process.on('SIGINT', () => {
-    console.log("Ricevuto SIGINT. Pulizia GPIO...");
-    cleanupStatusLed();
-    closeOSC();
-    ledConfigs.forEach(config => {
-      if (config.gpio) {
-        config.gpio.pwmWrite(STATUS_LED_OFF); // Turn off LED
-      }
-    });
-    console.log("GPIO puliti. Uscita.");
-    process.exit(0);
-  });
-})();
+//   // Graceful shutdown
+//   process.on('SIGINT', () => {
+//     console.log("Ricevuto SIGINT. Pulizia GPIO...");
+//     cleanupStatusLed();
+//     closeOSC();
+//     ledConfigs.forEach(config => {
+//       if (config.gpio) {
+//         config.gpio.pwmWrite(STATUS_LED_OFF); // Turn off LED
+//       }
+//     });
+//     console.log("GPIO puliti. Uscita.");
+//     process.exit(0);
+//   });
+// })();
