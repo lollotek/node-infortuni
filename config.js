@@ -49,7 +49,7 @@ class LedConfig {
 }
 
 // --- Configurazione HTTP ---
-const CONFIG_ENDPOINT_BASE = "https://martin-infortuni.netlify.app/.netlify/functions/upload-supa";
+const CONFIG_ENDPOINT_BASE = "http://localhost:3000/upload-supa"; // "https://martin-infortuni.netlify.app/.netlify/functions/upload-supa";
 const CONFIG_FETCH_INTERVAL_MS = 30000; // 30 secondi
 
 module.exports = {

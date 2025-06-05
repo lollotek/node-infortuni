@@ -68,17 +68,17 @@ async function fetchLedConfiguration(rowNum, configs, maxRowsRef, id = -1) {
         }        
       }else{
         const ledJson = ledConfigsJson[id-1];
-        configs[id].minIntensity = parseFloat(ledJson.minI !== undefined ? ledJson.minI : 0);
-        configs[id].maxIntensity = parseFloat(ledJson.maxI !== undefined ? ledJson.maxI : 255);
-        configs[id].cycleType = parseFloat(ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT);
-        configs[id].stepValue = parseFloat(ledJson.stV !== undefined ? ledJson.stV : 5);
-        configs[id].stepIntervalMs = parseFloat(ledJson.stMs !== undefined ? ledJson.stMs : 50);
-        configs[id].randomness = parseFloat(ledJson.rand !== undefined ? ledJson.rand : 0);
-        configs[id].maxMsDuration = parseFloat(ledJson.maxMs !== undefined ? ledJson.maxMs : 0);
-        configs[id].minMsDuration = parseFloat(ledJson.minMs !== undefined ? ledJson.minMs : 0);
+        configs[id-1].minIntensity = parseFloat(ledJson.minI !== undefined ? ledJson.minI : 0);
+        configs[id-1].maxIntensity = parseFloat(ledJson.maxI !== undefined ? ledJson.maxI : 255);
+        configs[id-1].cycleType = parseFloat(ledJson.cyT !== undefined ? ledJson.cyT : CYCLE_INVERT);
+        configs[id-1].stepValue = parseFloat(ledJson.stV !== undefined ? ledJson.stV : 5);
+        configs[id-1].stepIntervalMs = parseFloat(ledJson.stMs !== undefined ? ledJson.stMs : 50);
+        configs[id-1].randomness = parseFloat(ledJson.rand !== undefined ? ledJson.rand : 0);
+        configs[id-1].maxMsDuration = parseFloat(ledJson.maxMs !== undefined ? ledJson.maxMs : 0);
+        configs[id-1].minMsDuration = parseFloat(ledJson.minMs !== undefined ? ledJson.minMs : 0);
 
-        resetLedState(configs[id]);
-        console.log(`LED ${id} configurato:`, JSON.stringify(configs[id], null, 2));
+        resetLedState(configs[id-1]);
+        console.log(`LED ${id} configurato:`, JSON.stringify(configs[id-1], null, 2));
       }
 
       return true;
